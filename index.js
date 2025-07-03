@@ -165,6 +165,8 @@ client.on ('message', async msg => {
   const upgrade = MessageMedia.fromFilePath('./assets/img_upgrade.jpg');
   const hugoRosa = '5521981764373@c.us';
   const jorgeAugusto = '5521999363578@c.us';
+  const grupo = '120363420678952884@g.us';
+  const gatilhoADV = 'Atentus Advertisements Zap';
   let mensagemCliente = [];
   const nomeContato = contato.pushname || contato.name || "Sem nome";
   const numeroContato = contato.number || msg.from;
@@ -174,7 +176,14 @@ client.on ('message', async msg => {
   const userState = state[from];
 
   if (userState.step === 0) {
-      if (saudacoes.some(palavra => msg.body.includes(palavra))) {
+      if (msg.body.includes(gatilhoADV)) {
+          await enviarMensagemInicial(logo, '🤖 - *Excelente escolha!*\n\nO *Atentus Advertisements Zap* é a solução perfeita para quem precisa anunciar em muitos grupos de whatsapp.');
+          await enviarMensagemTexto('🤖 - *Além disso ele oferece várias funções extremamente úteis!*\n_Tais como:_\n\n🔷 - *Criação de anúncios com imagens, vídeos ou gifs.*\n🔷 - *Geração de links personalizados para direcionamento.*\n🔷 - *Reconhecimento automático dos seus grupos de whatsapp.*\n🔷 - *Programe até 6 horários diferentes de segunda a sábado*\n🔷 - *Fácil conexão com o whatsapp.*\n🔷 - *Acesso pelo PC, Smartphones ou Tablets.*\n🔷 - *E muito mais...*');
+          await enviarMensagemTexto('🤖 - Vou deixar com você o link do nosso vídeo demonstrativo no You Tube, abaixo! 👇\n\nhttps://youtu.be/6DC4RUk0REI?si=Qv6iHEFZ6zRRm3Rr');
+          await enviarMensagemInicial(especialista, '🤖 Antes de encaminhar a um especialista, irei pedir que digite as seguintes informações:\n\n🔹 *- Nome da empresa*\n🔹 *- Nome para contato*\n\n*Após escrever as informações solicitadas digite:*\n0️⃣ para enviar\n1️⃣ para retornar ao menu principal.');
+          state[from] = { step: 7 };
+          return;
+      }if (saudacoes.some(palavra => msg.body.includes(palavra))) {
           state[from].step = 1;
           await enviarMensagemInicial(logo, mensagemInicial);
           return;
@@ -443,6 +452,41 @@ switch (mensagem) {
                 return;    
     
    }
+}else if(userState.step === 7){
+    if (!state[from].mensagens) state[from].mensagens = [];
+
+    switch (mensagem) {
+        case "1":
+            await enviarMensagemTexto('🔁 Retornando ao menu principal...');
+            await enviarMensagemInicial(logo, mensagemInicial);
+            state[from] = { step: 1 }; 
+            return;
+
+        case "0":
+            if (state[from].mensagens.length === 0) {
+                await enviarMensagemTexto('⚠️ Nenhuma informação foi registrada ainda.');
+                return;
+            }
+
+            let mensagemFinal = `📩 *Novo pedido Atentus Cloud*\n_Interesse em Atentus Advertisements Zap_\n\n👤 *Contato:* ${nomeContato}\n📱 *Número:* ${numeroContato}\n\n📋 *Informações enviadas:*\n`;
+            state[from].mensagens.forEach((linha, index) => {
+                mensagemFinal += `\n${index + 1}️⃣ ${linha}`;
+            });
+
+            await client.sendMessage(jorgeAugusto, mensagemFinal);
+            await client.sendMessage(hugoRosa, mensagemFinal);
+            await client.sendMessage(grupo, mensagemFinal);
+            await enviarMensagemTexto('✅ Suas informações foram enviadas com sucesso! Em breve um especialista entrará em contato.');
+            await enviarMensagemTexto('🤖 *Obrigado pelo contato!*');
+
+            delete state[from]; 
+            return;
+
+        default:
+            state[from].mensagens.push(mensagem); 
+            await enviarMensagemTexto('✍️ *Informação registrada.*\n\n0️⃣ *- ENVIAR*\n1️⃣ *- CANCELAR*');
+            return;
+    }
 }
 });
 
